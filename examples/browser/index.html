@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RLtools pendulum training</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+    canvas { border: 1px solid #ccc; max-width: 100%; }
+    button, input { font: inherit; margin: .25rem; }
+  </style>
+</head>
+<body>
+  <h1>Pendulum SAC in WebAssembly</h1>
+  <p>Train the RLtools pendulum swing-up in a worker. The line shows the latest training state.</p>
+  <label>Seed <input id="seed" type="number" min="0" max="2147483647" value="0"></label>
+  <button id="start">Start</button>
+  <button id="stop" disabled>Stop</button>
+  <p id="status">Ready</p>
+  <canvas id="pendulum" width="300" height="300" aria-label="Pendulum visualization"></canvas>
+  <h2>Evaluation returns</h2>
+  <canvas id="chart" width="700" height="220" aria-label="Mean evaluation returns"></canvas>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
