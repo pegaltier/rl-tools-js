@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trading with PPO</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">RLtools / interactive example</p>
+      <h1>Learn a trading strategy with PPO</h1>
+      <p>Watch an agent learn from a synthetic market, then inspect its decisions on a separate evaluation series.</p>
+      <p class="notice"><strong>Educational simulation only.</strong> Synthetic prices and simplified execution do not represent real markets. This is not financial advice.</p>
+    </header>
+    <section aria-labelledby="run-title">
+      <h2 id="run-title">1. Train the agent</h2>
+      <p>PPO collects experience from the training market and updates a policy that chooses a position. Training runs in a worker so the page stays responsive.</p>
+      <p>At each step the agent observes the latest return, trailing three- and five-step returns, and its current position. Its continuous PPO action becomes short, flat, or long. The reward is the position's next log return minus a transaction cost when the position changes.</p>
+      <div class="controls">
+        <label>Seed <input id="seed" type="number" min="0" max="2147483647" step="1" value="0"></label>
+        <label>PPO iterations <input id="iterations" type="number" min="0" step="1" value="10"></label>
+        <button id="start">Train and evaluate</button>
+        <button id="stop" disabled>Stop</button>
+      </div>
+      <p id="status" role="status">Ready. Run zero iterations to inspect the untrained policy.</p>
+    </section>
+    <section aria-labelledby="results-title">
+      <h2 id="results-title">2. Inspect the held-out evaluation</h2>
+      <p>The policy sees only information available at each decision. The evaluation uses a different synthetic series for 64 steps. Price starts at 100 and equity at 1; each position applies to the interval ending at that point. The chart lines have separate scales. Positions are long (+1), flat (0), or short (-1).</p>
+      <p>Changing position costs 0.05% per unit of position change (a direct long-to-short flip costs 0.10%). Equity is marked to market, with no forced closing cost at the end. Market impact, financing, taxes, and bracket orders are not modeled.</p>
+      <div class="metrics">
+        <div><span>Training iterations</span><strong id="metric-iterations">—</strong></div>
+        <div><span>Evaluation return</span><strong id="metric-return">—</strong></div>
+        <div><span>Final equity</span><strong id="metric-equity">—</strong></div>
+      </div>
+      <canvas id="chart" width="1000" height="320" aria-label="Held-out price and account equity chart"></canvas>
+      <p class="legend"><span class="price-key" id="price-range">● Price</span> <span class="equity-key" id="equity-range">● Equity</span></p>
+      <h3>Recent evaluation points</h3>
+      <div class="table-wrap">
+        <table><thead><tr><th>Point</th><th>Price</th><th>Equity</th><th>Position</th></tr></thead><tbody id="points"></tbody></table>
+      </div>
+      <details><summary>Full result (same JSON as Node.js)</summary><pre id="result">No evaluation yet.</pre></details>
+    </section>
+    <section>
+      <h2>3. What to look for</h2>
+      <p>Compare the same seed before and after training. A profitable simulated run does not guarantee a profitable real strategy: costs, market changes, and random variation matter. Try several seeds instead of relying on one result.</p>
+      <p>Inspired by <a href="https://github.com/ZiadFrancis/Reinforcement_Trading_Part_2">Reinforcement Trading Part 2</a>. This deliberately smaller demonstration is not its historical-data backtesting pipeline.</p>
+    </section>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
