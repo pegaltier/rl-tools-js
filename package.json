@@ -9,7 +9,8 @@
   "scripts": {
     "build:wasm": "bash scripts/build-wasm.sh",
     "test": "node --test",
-    "example:node": "node examples/node/train.js"
+    "example:node": "node examples/node/train.js",
+    "example:trading": "node examples/trading/train.js"
   },
   "engines": { "node": ">=18" },
   "license": "MIT"

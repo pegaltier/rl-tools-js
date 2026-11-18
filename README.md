@@ -1,8 +1,8 @@
 # rl-tools-js
 
-**Train and run an RLtools pendulum agent in Node.js or the browser, powered by WebAssembly.**
+**Train and run RLtools agents in Node.js or the browser, powered by WebAssembly.**
 
-`rl-tools-js` wraps the [RLtools](https://github.com/rl-tools/rl-tools) Pendulum-v1 Soft Actor-Critic (SAC) demo and includes browser versions of the pendulum and racing-car demos from [rl.tools](https://rl.tools/). The compiled WASM is included: you do not need a C++ toolchain to try it.
+`rl-tools-js` wraps the [RLtools](https://github.com/rl-tools/rl-tools) Pendulum-v1 Soft Actor-Critic (SAC) demo and includes browser versions of the pendulum and racing-car demos from [rl.tools](https://rl.tools/), plus a synthetic trading PPO example. The compiled WASM is included: you do not need a C++ toolchain to try it.
 
 > **Experimental:** This is not a general-purpose binding for all RLtools algorithms. The pendulum actor is trained from scratch; pretrained checkpoint loading and saving are not supported. The car example is browser-only.
 
@@ -54,10 +54,25 @@ python3 -m http.server 8000
 | --- | --- | --- |
 | Pendulum SAC | [localhost:8000/examples/browser/](http://localhost:8000/examples/browser/) | Trains in a Web Worker, animates the pendulum and plots evaluation returns. |
 | Racing car PPO | [localhost:8000/examples/car/](http://localhost:8000/examples/car/) | Draw or use the default track, save it, then drive with arrow keys or start training. |
+| Trading PPO | [localhost:8000/examples/trading/](http://localhost:8000/examples/trading/) | Trains on a synthetic market in a worker and visualizes a separate evaluation. |
 
 Car training is substantially more expensive than pendulum training. Stopping the pendulum demo terminates its worker and releases its WASM memory.
 
 Browser applications can also import `src/index.js` as an ES module. Serve it and the accompanying `dist` files at their relative paths over HTTP; `file://` loading is not supported. When using a bundler, ensure the generated JavaScript and WASM assets are emitted and accessible.
+
+## Trading example
+
+The trading example uses the same RLtools PPO algorithm family as the car, with a much simpler synthetic trading environment. It is inspired by [Reinforcement Trading Part 2](https://github.com/ZiadFrancis/Reinforcement_Trading_Part_2), not a reproduction of its historical-data pipeline or bracket-order simulator. It is an educational simulation, not financial advice or evidence of real-world profitability.
+
+Use the browser demo above or run without a UI:
+
+```sh
+npm run example:trading -- 10 0
+```
+
+The arguments are PPO iterations and seed (defaults: `10` and `0`). The command prints the same evaluation JSON shown in the browser's **Full result** panel: iteration, finished flag, total return, and price/equity/position trajectory. With the same seed and iteration count, both modes use the same training and evaluation logic. Use zero iterations to inspect the initial policy. Evaluation is separate from the training market, but this synthetic example is not a substitute for realistic backtesting or out-of-sample financial validation.
+
+Each iteration collects 512 transitions; training stops after 64 iterations. The environment generates synthetic sinusoidal log returns. The observation contains the latest return, trailing five- and three-step average returns, and the current position. A continuous PPO action above 0.25 selects long, below -0.25 short, and otherwise flat. Reward is the next log return times the chosen position, less 0.0005 per unit of position change. Evaluation has 64 transitions on a distinct synthetic series, starting at price 100 and equity 1. Each trajectory position applies to the interval ending at that point; equity compounds the net log returns, and total return is final equity minus 1. Positions remain marked to market at the end, without a forced closing charge. Market impact, financing, taxes, historical data, and stop-loss/take-profit orders are not modeled.
 
 ## Pendulum API
 
